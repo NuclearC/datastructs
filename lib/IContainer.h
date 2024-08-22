@@ -13,15 +13,15 @@ namespace NC::DataStructures {
 		using Predicate = std::function<bool(const T& )>;
 
 		virtual int Insert(const T& item) = 0;
-		virtual bool Contains(const T& item) = 0;
-		virtual bool Contains(Predicate pred) = 0;
+		virtual bool Contains(const T& item) const = 0;
+		virtual bool Contains(Predicate pred) const = 0;
 
-		virtual int Count(const T& item) = 0;
-		virtual int CountIf(Predicate pred) = 0;
+		virtual int Count(const T& item) const  = 0;
+		virtual int CountIf(Predicate pred) const  = 0;
 		virtual bool Remove(const T& item) = 0;
 		virtual int RemoveIf(Predicate pred) = 0;
 
-		virtual bool Empty() = 0;
+		virtual bool Empty() const  = 0;
 	};
 
 }

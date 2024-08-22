@@ -95,7 +95,7 @@ namespace NC::DataStructures {
 			ResolveRanges(curIdx);
 		}
 
-		int ResolveQuadrant(AABB const& parent, AABB const& resolvee) {
+		int ResolveQuadrant(AABB const& parent, AABB const& resolvee) const {
 			auto pCenter = parent.GetCenter();
 			if (resolvee.bottom <= pCenter.second) { // top
 				if (resolvee.right <= pCenter.first) { // left
@@ -117,7 +117,7 @@ namespace NC::DataStructures {
 			return -1;
 		}
 
-		int FindNode(const AABB& range) {
+		int FindNode(const AABB& range) const {
 			int nodeIndex = 0;
 
 			while (nodes[nodeIndex].range.Contains(range)) {
@@ -140,9 +140,7 @@ namespace NC::DataStructures {
 		using Predicate = ISpatialContainer<T>::Predicate;
 		using QueryCallback = ISpatialContainer<T>::QueryCallback;
 
-		QuadTree() {
-			nodes.resize(NodeCount());
-		}
+		QuadTree() = default;
 
 		explicit QuadTree(const AABB& bounds) {
 			nodes.resize(NodeCount());
@@ -155,6 +153,14 @@ namespace NC::DataStructures {
 			ResolveRanges();
 		}
 
+		QuadTree(const QuadTree& ) = default;
+		QuadTree(QuadTree&&) = default;
+		~QuadTree() = default;
+
+		QuadTree& operator=(const QuadTree&) = default;
+		QuadTree& operator=(QuadTree&&) = default;
+			 
+
 		virtual int Insert(const T& item) override {
 			const AABB& itemAabb = item.GetAABB();
 			auto nodeIndex = FindNode(itemAabb);
@@ -162,7 +168,7 @@ namespace NC::DataStructures {
 			return nodeIndex;
 		}
 
-		virtual bool Empty() override {
+		virtual bool Empty() const override {
 			return std::any_of(std::begin(nodes), std::end(nodes), [] (auto const& node) {
 				return !node.items.empty();
 							   });
@@ -185,7 +191,7 @@ namespace NC::DataStructures {
 		 * @param nodeIndex the index of the specified node
 		 * @return true or false
 		 */
-		bool Empty(int nodeIndex) {
+		bool Empty(int nodeIndex) const {
 			bool isEmpty = nodes[nodeIndex].items.empty();
 			for (int i = 4 * nodeIndex + 1; i <= std::min(NodeCount() - 1, 4 * nodeIndex + 4); i++) {
 				isEmpty = isEmpty && Empty(i);
@@ -200,7 +206,7 @@ namespace NC::DataStructures {
 		 * @param callback the callback
 		 * @param nodeIndex the index of the root node
 		 */
-		virtual void Query(const AABB& range, QueryCallback callback, int nodeIndex = 0) override {
+		virtual void Query(const AABB& range, QueryCallback callback, int nodeIndex = 0) const override {
 
 			if (nodes[nodeIndex].range.Intersects(range)) {
 				for (auto& item : nodes[nodeIndex].items) {
@@ -222,7 +228,7 @@ namespace NC::DataStructures {
 		 * @param elements output elements
 		 * @param nodeIndex the index of the root node
 		 */
-		virtual void Query(const AABB& range, std::vector<T>& elements, int nodeIndex = 0) override {
+		virtual void Query(const AABB& range, std::vector<T>& elements, int nodeIndex = 0) const override {
 
 			if (nodes[nodeIndex].range.Intersects(range)) {
 				for (auto& item : nodes[nodeIndex].items) {
@@ -243,18 +249,18 @@ namespace NC::DataStructures {
 		 * @param range the range
 		 * @return a vector of elements in the range
 		 */
-		virtual std::vector<T> Query(const AABB& range) override {
+		virtual std::vector<T> Query(const AABB& range) const override {
 			std::vector<T> elements;
 			Query(range, elements, 0);
 			return elements;
 		}
 
-		virtual bool Contains(const T& item) override { return false; }
-		virtual bool Contains(Predicate pred) override { return false; }
+		virtual bool Contains(const T& item) const override { return false; }
+		virtual bool Contains(Predicate pred) const override { return false; }
 
-		virtual int Count(const T& item) override { return 0; }
+		virtual int Count(const T& item) const override { return 0; }
 
-		virtual int CountIf(Predicate pred) override { return 0; }
+		virtual int CountIf(Predicate pred) const override { return 0; }
 
 		virtual bool Remove(const T& item) override {
 			const AABB& itemAabb = item.GetAABB();

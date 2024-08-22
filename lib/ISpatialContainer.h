@@ -14,9 +14,9 @@ namespace NC::DataStructures {
 		using Predicate = IContainer<T>::Predicate;
 		using QueryCallback = std::function<void(const T&)>;
 
-		virtual void Query(const AABB& range, QueryCallback callback, int nodeIndex = 0) = 0;
-		virtual void Query(const AABB& range, std::vector<T>& elements, int nodeIndex = 0) = 0;
-		virtual std::vector<T> Query(const AABB& range) = 0;
+		virtual void Query(const AABB& range, QueryCallback callback, int nodeIndex = 0) const = 0;
+		virtual void Query(const AABB& range, std::vector<T>& elements, int nodeIndex = 0) const = 0;
+		virtual std::vector<T> Query(const AABB& range) const = 0;
 		virtual int RemoveIf(const AABB& range, Predicate pred) = 0;
 	};
 

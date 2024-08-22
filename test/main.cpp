@@ -43,8 +43,8 @@ int main(int argc, char* argv[]) {
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 
-	constexpr float sizeX = 900.f, sizeY = 900.f;
-	NCDS::ISpatialContainer<Box>* spatialCont = new NCDS::QuadTree<Box, 5, 5>{NCDS::AABB{0, 0, sizeX, sizeY}};
+	constexpr float sizeX = 900, sizeY = 900;
+	auto qt = NCDS::QuadTree<Box, 5, 5>{NCDS::AABB{0, 0, sizeX, sizeY}};
 
 	auto window = SDL_CreateWindow("title", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 960, {});
 	auto renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -55,12 +55,12 @@ int main(int argc, char* argv[]) {
 	std::vector<Box> boxes;
 
 	int cnter = 0;
-	for (int i = 0; i < 5000; i++) {
+	for (int i = 0; i < 2000; i++) {
 		float x = dist(rd), y = dist(rd);
 		auto box = Box{x,y,x +
 				  10, y + 10, cnter++, dist(rd)};
 		boxes.push_back(box);
-		spatialCont->Insert(box);
+		qt.Insert(box);
 	}
 
 	bool useQt = true;
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
 
 
 		for (auto& box : boxes) { 
-			spatialCont->Remove(box);
+			qt.Remove(box);
 
 			float vx = std::cos(box.moveAng),
 				vy = std::sin(box.moveAng);
@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
 			box.aabb.right = box.aabb.left + 10;
 			box.aabb.bottom = box.aabb.top + 10;
 
-			spatialCont->Insert(box);
+			qt.Insert(box);
 		}
 
 		const auto collisionBegin = std::chrono::high_resolution_clock::now();
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
 		else {
 			for (auto& box : boxes) {
 				bool collided = false;
-				spatialCont->Query(box.GetAABB(), [&box, &collided] (const auto& other) {
+				qt.Query(box.GetAABB(), [&box, &collided] (const auto& other) {
 					if (other != box) collided = true;
 									  });
 				if (collided)
